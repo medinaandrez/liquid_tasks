@@ -5,6 +5,8 @@ struct TaskFormView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
+    var taskToEdit: Task?
+    
     @State private var title: String = ""
     @State private var notes: String = ""
     @State private var hasDueDate: Bool = false
@@ -140,7 +142,25 @@ struct TaskFormView: View {
                 LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea()
             )
-            .navigationTitle("Nueva Tarea")
+            .navigationTitle(taskToEdit == nil ? "Nueva Tarea" : "Editar Tarea")
+            .onAppear {
+                if let task = taskToEdit {
+                    title = task.title
+                    notes = task.notes
+                    if let sDate = task.startDate {
+                        hasStartDate = true
+                        startDate = sDate
+                    }
+                    if let dDate = task.dueDate {
+                        hasDueDate = true
+                        dueDate = dDate
+                    }
+                    selectedProject = task.project
+                    if let t = task.tags {
+                        selectedTags = Set(t)
+                    }
+                }
+            }
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -165,17 +185,26 @@ struct TaskFormView: View {
     }
     
     private func saveTask() {
-        let newTask = Task(
-            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
-            isCompleted: false,
-            startDate: hasStartDate ? startDate : nil,
-            dueDate: hasDueDate ? dueDate : nil
-        )
-        
-        newTask.project = selectedProject
-        newTask.tags = Array(selectedTags)
-        modelContext.insert(newTask)
+        if let task = taskToEdit {
+            task.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            task.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+            task.startDate = hasStartDate ? startDate : nil
+            task.dueDate = hasDueDate ? dueDate : nil
+            task.project = selectedProject
+            task.tags = Array(selectedTags)
+        } else {
+            let newTask = Task(
+                title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+                notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
+                isCompleted: false,
+                startDate: hasStartDate ? startDate : nil,
+                dueDate: hasDueDate ? dueDate : nil
+            )
+            
+            newTask.project = selectedProject
+            newTask.tags = Array(selectedTags)
+            modelContext.insert(newTask)
+        }
         dismiss()
     }
 }

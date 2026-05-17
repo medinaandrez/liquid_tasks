@@ -85,8 +85,6 @@ struct DetailView: View {
         case .inbox: return "Bandeja de Entrada"
         case .today: return "Hoy"
         case .upcoming: return "Próximo"
-        case .anytime: return "Cualquier Día"
-        case .someday: return "Algún Día"
         case .area(let area): return area.title
         case .project(let project): return project.title
         case .tag(let tag): return "#\(tag.name)"

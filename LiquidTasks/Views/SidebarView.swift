@@ -5,8 +5,6 @@ enum NavigationItem: Hashable {
     case inbox
     case today
     case upcoming
-    case anytime
-    case someday
     case area(Area)
     case project(Project)
     case tag(Tag)
@@ -14,6 +12,7 @@ enum NavigationItem: Hashable {
 
 struct SidebarView: View {
     @Query(sort: \Area.creationDate) private var areas: [Area]
+    @Query(filter: #Predicate<Project> { $0.area == nil }, sort: \Project.creationDate) private var orphanProjects: [Project]
     @Query(sort: \Tag.name) private var tags: [Tag]
     @Binding var selection: NavigationItem?
     
@@ -81,14 +80,14 @@ struct SidebarView: View {
                 .buttonStyle(.plain)
             }
             
-            Section("Planificación") {
-                NavigationLink(value: NavigationItem.anytime) {
-                    Label("Cualquier día", systemImage: "tray")
-                        .foregroundStyle(.secondary)
-                }
-                NavigationLink(value: NavigationItem.someday) {
-                    Label("Algún día", systemImage: "archivebox")
-                        .foregroundStyle(.secondary)
+            if !orphanProjects.isEmpty {
+                Section("Proyectos Sueltos") {
+                    ForEach(orphanProjects) { project in
+                        NavigationLink(value: NavigationItem.project(project)) {
+                            Label(project.title, systemImage: "circle.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
             

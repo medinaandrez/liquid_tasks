@@ -6,9 +6,11 @@ struct TaskListView: View {
     @Query private var allTasks: [Task]
     var selection: NavigationItem?
     
+    @State private var taskToEdit: Task?
+    
     // Dynamic filtering based on selection
     var filteredTasks: [Task] {
-        allTasks.filter { task in
+        var tasks = allTasks.filter { task in
             switch selection {
             case .inbox:
                 return task.project == nil && task.area == nil
@@ -31,23 +33,52 @@ struct TaskListView: View {
             case .none:
                 return false
             }
-        }.sorted { ($0.dueDate ?? Date.distantFuture) < ($1.dueDate ?? Date.distantFuture) }
+        }
+        
+        // Sort first by sortOrder (Drag & Drop), then creationDate
+        tasks.sort {
+            if $0.sortOrder != $1.sortOrder {
+                return $0.sortOrder < $1.sortOrder
+            }
+            return $0.creationDate < $1.creationDate
+        }
+        return tasks
     }
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(filteredTasks) { task in
+        List {
+            ForEach(filteredTasks) { task in
+                Button {
+                    taskToEdit = task
+                } label: {
                     TaskRowView(task: task)
-                        .contextMenu {
-                            Button("Eliminar", role: .destructive) {
-                                modelContext.delete(task)
-                            }
-                        }
+                }
+                .buttonStyle(.plain)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                .contextMenu {
+                    Button("Eliminar", role: .destructive) {
+                        modelContext.delete(task)
+                    }
                 }
             }
-            .padding()
+            .onMove(perform: moveTask)
         }
+        .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .sheet(item: $taskToEdit) { task in
+            TaskFormView(taskToEdit: task)
+        }
+    }
+    
+    private func moveTask(from source: IndexSet, to destination: Int) {
+        var tasks = filteredTasks
+        tasks.move(fromOffsets: source, toOffset: destination)
+        
+        // Update sortOrder in database
+        for (index, task) in tasks.enumerated() {
+            task.sortOrder = index
+        }
     }
 }
