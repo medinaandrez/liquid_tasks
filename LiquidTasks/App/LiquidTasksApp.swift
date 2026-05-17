@@ -1,0 +1,27 @@
+import SwiftUI
+import SwiftData
+
+@main
+struct LiquidTasksApp: App {
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([
+            Task.self, Project.self, Area.self, Tag.self
+        ])
+        
+        // Estrictamente almacenamiento local
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+
+        do {
+            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+        } catch {
+            fatalError("No se pudo inicializar SwiftData: \(error)")
+        }
+    }()
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+        .modelContainer(sharedModelContainer)
+    }
+}
