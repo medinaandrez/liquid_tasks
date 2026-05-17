@@ -20,10 +20,7 @@ struct TaskListView: View {
             case .upcoming:
                 guard let dueDate = task.dueDate else { return false }
                 return dueDate > Date() && !Calendar.current.isDateInToday(dueDate)
-            case .anytime:
-                return true
-            case .someday:
-                return task.dueDate == nil && task.startDate == nil
+
             case .area(let selectedArea):
                 return task.area?.id == selectedArea.id || task.project?.area?.id == selectedArea.id
             case .project(let selectedProject):
@@ -48,12 +45,11 @@ struct TaskListView: View {
     var body: some View {
         List {
             ForEach(filteredTasks) { task in
-                Button {
-                    taskToEdit = task
-                } label: {
-                    TaskRowView(task: task)
-                }
-                .buttonStyle(.plain)
+                TaskRowView(task: task)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        taskToEdit = task
+                    }
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))

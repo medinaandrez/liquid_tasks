@@ -12,7 +12,7 @@ final class Task {
     var startDate: Date? // Permite la dinámica de "Things 3" (programar cuándo empezar)
     var dueDate: Date?   // Permite la dinámica de "Todoist" (fecha de vencimiento estricta)
     var creationDate: Date
-    var sortOrder: Int // Soporte para reordenamiento (Drag & Drop)
+    var sortOrder: Int = 0 // Soporte para reordenamiento, con valor por defecto para migración
     
     // Relaciones (inferidas a través de los inversos en los padres/entidades relacionadas)
     var project: Project?

@@ -5,6 +5,8 @@ struct TagFormView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
+    var tagToEdit: Tag?
+    
     @State private var name: String = ""
     @State private var colorHex: String = "#FF3B30" // Default Red
     
@@ -76,7 +78,13 @@ struct TagFormView: View {
                 LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea()
             )
-            .navigationTitle("Nueva Etiqueta")
+            .navigationTitle(tagToEdit == nil ? "Nueva Etiqueta" : "Editar Etiqueta")
+            .onAppear {
+                if let tag = tagToEdit {
+                    name = tag.name
+                    colorHex = tag.colorHex
+                }
+            }
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -101,11 +109,16 @@ struct TagFormView: View {
     }
     
     private func saveTag() {
-        let newTag = Tag(
-            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-            colorHex: colorHex
-        )
-        modelContext.insert(newTag)
+        if let tag = tagToEdit {
+            tag.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            tag.colorHex = colorHex
+        } else {
+            let newTag = Tag(
+                name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+                colorHex: colorHex
+            )
+            modelContext.insert(newTag)
+        }
         dismiss()
     }
 }

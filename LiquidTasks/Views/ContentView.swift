@@ -67,6 +67,11 @@ struct DetailView: View {
         }
         .navigationTitle(titleForSelection())
         .toolbar {
+            #if os(iOS)
+            ToolbarItem(placement: .topBarTrailing) {
+                EditButton()
+            }
+            #endif
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showingTaskForm = true

@@ -11,6 +11,7 @@ enum NavigationItem: Hashable {
 }
 
 struct SidebarView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \Area.creationDate) private var areas: [Area]
     @Query(filter: #Predicate<Project> { $0.area == nil }, sort: \Project.creationDate) private var orphanProjects: [Project]
     @Query(sort: \Tag.name) private var tags: [Tag]
@@ -19,6 +20,10 @@ struct SidebarView: View {
     @State private var showingAreaForm = false
     @State private var showingProjectForm = false
     @State private var showingTagForm = false
+    
+    @State private var areaToEdit: Area?
+    @State private var projectToEdit: Project?
+    @State private var tagToEdit: Tag?
     
     var body: some View {
         List(selection: $selection) {
@@ -48,6 +53,17 @@ struct SidebarView: View {
                                     Label(project.title, systemImage: "circle.fill")
                                         .foregroundStyle(.secondary)
                                 }
+                                .contextMenu {
+                                    Button("Editar") {
+                                        projectToEdit = project
+                                    }
+                                    Button("Eliminar Proyecto", role: .destructive) {
+                                        modelContext.delete(project)
+                                    }
+                                }
+                                .simultaneousGesture(TapGesture(count: 2).onEnded {
+                                    projectToEdit = project
+                                })
                             }
                         } else {
                             Text("Sin proyectos")
@@ -60,6 +76,17 @@ struct SidebarView: View {
                             Label(area.title, systemImage: "folder.fill")
                                 .foregroundStyle(.primary)
                         }
+                        .contextMenu {
+                            Button("Editar") {
+                                areaToEdit = area
+                            }
+                            Button("Eliminar Área", role: .destructive) {
+                                modelContext.delete(area)
+                            }
+                        }
+                        .simultaneousGesture(TapGesture(count: 2).onEnded {
+                            areaToEdit = area
+                        })
                     }
                 }
                 
@@ -87,6 +114,17 @@ struct SidebarView: View {
                             Label(project.title, systemImage: "circle.fill")
                                 .foregroundStyle(.secondary)
                         }
+                        .contextMenu {
+                            Button("Editar") {
+                                projectToEdit = project
+                            }
+                            Button("Eliminar Proyecto", role: .destructive) {
+                                modelContext.delete(project)
+                            }
+                        }
+                        .simultaneousGesture(TapGesture(count: 2).onEnded {
+                            projectToEdit = project
+                        })
                     }
                 }
             }
@@ -102,6 +140,17 @@ struct SidebarView: View {
                                 .foregroundStyle(.primary)
                         }
                     }
+                    .contextMenu {
+                        Button("Editar") {
+                            tagToEdit = tag
+                        }
+                        Button("Eliminar Etiqueta", role: .destructive) {
+                            modelContext.delete(tag)
+                        }
+                    }
+                    .simultaneousGesture(TapGesture(count: 2).onEnded {
+                        tagToEdit = tag
+                    })
                 }
                 
                 Button {
@@ -128,6 +177,15 @@ struct SidebarView: View {
         }
         .sheet(isPresented: $showingTagForm) {
             TagFormView()
+        }
+        .sheet(item: $areaToEdit) { area in
+            AreaFormView(areaToEdit: area)
+        }
+        .sheet(item: $projectToEdit) { project in
+            ProjectFormView(projectToEdit: project)
+        }
+        .sheet(item: $tagToEdit) { tag in
+            TagFormView(tagToEdit: tag)
         }
     }
 }

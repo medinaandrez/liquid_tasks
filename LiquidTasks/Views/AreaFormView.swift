@@ -5,6 +5,8 @@ struct AreaFormView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
+    var areaToEdit: Area?
+    
     @State private var title: String = ""
     
     var body: some View {
@@ -34,7 +36,12 @@ struct AreaFormView: View {
                 LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea()
             )
-            .navigationTitle("Nueva Área")
+            .navigationTitle(areaToEdit == nil ? "Nueva Área" : "Editar Área")
+            .onAppear {
+                if let area = areaToEdit {
+                    title = area.title
+                }
+            }
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -59,10 +66,14 @@ struct AreaFormView: View {
     }
     
     private func saveArea() {
-        let newArea = Area(
-            title: title.trimmingCharacters(in: .whitespacesAndNewlines)
-        )
-        modelContext.insert(newArea)
+        if let area = areaToEdit {
+            area.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            let newArea = Area(
+                title: title.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+            modelContext.insert(newArea)
+        }
         dismiss()
     }
 }

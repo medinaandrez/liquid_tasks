@@ -5,6 +5,8 @@ struct ProjectFormView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
+    var projectToEdit: Project?
+    
     @State private var title: String = ""
     @State private var notes: String = ""
     
@@ -69,7 +71,14 @@ struct ProjectFormView: View {
                 LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea()
             )
-            .navigationTitle("Nuevo Proyecto")
+            .navigationTitle(projectToEdit == nil ? "Nuevo Proyecto" : "Editar Proyecto")
+            .onAppear {
+                if let project = projectToEdit {
+                    title = project.title
+                    notes = project.notes
+                    selectedArea = project.area
+                }
+            }
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -94,13 +103,19 @@ struct ProjectFormView: View {
     }
     
     private func saveProject() {
-        let newProject = Project(
-            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
-            isCompleted: false
-        )
-        newProject.area = selectedArea
-        modelContext.insert(newProject)
+        if let project = projectToEdit {
+            project.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            project.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+            project.area = selectedArea
+        } else {
+            let newProject = Project(
+                title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+                notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
+                isCompleted: false
+            )
+            newProject.area = selectedArea
+            modelContext.insert(newProject)
+        }
         dismiss()
     }
 }
