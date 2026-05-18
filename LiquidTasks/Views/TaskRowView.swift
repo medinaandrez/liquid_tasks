@@ -58,6 +58,13 @@ struct TaskRowView: View {
                         }
                         .padding(.leading, 4)
                     }
+                    
+                    if let subtasks = task.subtasks, !subtasks.isEmpty {
+                        let completed = subtasks.filter { $0.isCompleted }.count
+                        Label("\(completed)/\(subtasks.count)", systemImage: "checklist")
+                            .font(.caption)
+                            .foregroundStyle(completed == subtasks.count ? .green : .secondary)
+                    }
                 }
             }
             

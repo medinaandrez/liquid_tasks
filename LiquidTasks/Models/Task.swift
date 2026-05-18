@@ -19,6 +19,9 @@ final class Task {
     var area: Area?
     var tags: [Tag]?
     
+    // Relación de uno a muchos (hijos)
+    @Relationship(deleteRule: .cascade, inverse: \Subtask.task) var subtasks: [Subtask]?
+    
     init(id: UUID = UUID(), title: String, notes: String = "", isCompleted: Bool = false, startDate: Date? = nil, dueDate: Date? = nil, creationDate: Date = Date(), sortOrder: Int = 0) {
         self.id = id
         self.title = title

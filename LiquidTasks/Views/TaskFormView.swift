@@ -1,6 +1,13 @@
 import SwiftUI
 import SwiftData
 
+struct SubtaskDraft: Identifiable {
+    let id = UUID()
+    var title: String
+    var isCompleted: Bool
+    var original: Subtask?
+}
+
 struct TaskFormView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -13,6 +20,9 @@ struct TaskFormView: View {
     @State private var dueDate: Date = Date()
     @State private var hasStartDate: Bool = false
     @State private var startDate: Date = Date()
+    
+    @State private var subtasks: [SubtaskDraft] = []
+    @State private var newSubtaskTitle: String = ""
     
     @Query private var projects: [Project]
     @State private var selectedProject: Project?
@@ -39,6 +49,55 @@ struct TaskFormView: View {
                         TextField("Notas (opcional)", text: $notes, axis: .vertical)
                             .textFieldStyle(.roundedBorder)
                             .lineLimit(3...6)
+                    }
+                    .padding()
+                    .background(.regularMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(.white.opacity(0.2), lineWidth: 1))
+                    
+                    // Bloque de Subtareas
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Checklist")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.secondary)
+                        
+                        ForEach($subtasks) { $subtask in
+                            HStack {
+                                Button {
+                                    subtask.isCompleted.toggle()
+                                } label: {
+                                    Image(systemName: subtask.isCompleted ? "checkmark.circle.fill" : "circle")
+                                        .foregroundStyle(subtask.isCompleted ? .green : .secondary)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                TextField("Subtarea", text: $subtask.title)
+                                    .strikethrough(subtask.isCompleted)
+                                    .foregroundStyle(subtask.isCompleted ? .secondary : .primary)
+                                
+                                Button(role: .destructive) {
+                                    subtasks.removeAll(where: { $0.id == subtask.id })
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .foregroundStyle(.secondary)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        
+                        HStack {
+                            Image(systemName: "plus.circle")
+                                .foregroundStyle(.secondary)
+                            TextField("Nueva subtarea", text: $newSubtaskTitle)
+                                .onSubmit {
+                                    let trimmed = newSubtaskTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+                                    if !trimmed.isEmpty {
+                                        subtasks.append(SubtaskDraft(title: trimmed, isCompleted: false))
+                                        newSubtaskTitle = ""
+                                    }
+                                }
+                        }
                     }
                     .padding()
                     .background(.regularMaterial)
@@ -159,6 +218,9 @@ struct TaskFormView: View {
                     if let t = task.tags {
                         selectedTags = Set(t)
                     }
+                    if let s = task.subtasks {
+                        subtasks = s.sorted(by: { $0.sortOrder < $1.sortOrder }).map { SubtaskDraft(title: $0.title, isCompleted: $0.isCompleted, original: $0) }
+                    }
                 }
             }
             #if os(iOS)
@@ -185,6 +247,28 @@ struct TaskFormView: View {
     }
     
     private func saveTask() {
+        // Prepare subtasks
+        if let oldSubtasks = taskToEdit?.subtasks {
+            for subtask in oldSubtasks {
+                modelContext.delete(subtask)
+            }
+        }
+        
+        var newSubtasksList: [Subtask] = []
+        for (index, draft) in subtasks.enumerated() {
+            let trimmed = draft.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty {
+                let newSubtask = Subtask(title: trimmed, isCompleted: draft.isCompleted, sortOrder: index)
+                newSubtasksList.append(newSubtask)
+            }
+        }
+        
+        let trimmedNew = newSubtaskTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedNew.isEmpty {
+            let newSubtask = Subtask(title: trimmedNew, isCompleted: false, sortOrder: newSubtasksList.count)
+            newSubtasksList.append(newSubtask)
+        }
+        
         if let task = taskToEdit {
             task.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
             task.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -192,6 +276,7 @@ struct TaskFormView: View {
             task.dueDate = hasDueDate ? dueDate : nil
             task.project = selectedProject
             task.tags = Array(selectedTags)
+            task.subtasks = newSubtasksList
         } else {
             let newTask = Task(
                 title: title.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -203,6 +288,7 @@ struct TaskFormView: View {
             
             newTask.project = selectedProject
             newTask.tags = Array(selectedTags)
+            newTask.subtasks = newSubtasksList
             modelContext.insert(newTask)
         }
         dismiss()
