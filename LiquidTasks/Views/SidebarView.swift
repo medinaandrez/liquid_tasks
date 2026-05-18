@@ -13,7 +13,7 @@ enum NavigationItem: Hashable {
 struct SidebarView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Area.creationDate) private var areas: [Area]
-    @Query(filter: #Predicate<Project> { $0.area == nil }, sort: \Project.creationDate) private var orphanProjects: [Project]
+    @Query(filter: #Predicate<Project> { $0.area == nil && $0.isCompleted == false }, sort: \Project.creationDate) private var orphanProjects: [Project]
     @Query(sort: \Tag.name) private var tags: [Tag]
     @Binding var selection: NavigationItem?
     
@@ -45,7 +45,7 @@ struct SidebarView: View {
             Section("Áreas de Enfoque") {
                 ForEach(areas) { area in
                     DisclosureGroup {
-                        if let projects = area.projects, !projects.isEmpty {
+                        if let projects = area.projects?.filter({ !$0.isCompleted }), !projects.isEmpty {
                             // Sort projects manually as SwiftData @Relationship arrays are not ordered
                             let sortedProjects = projects.sorted { $0.creationDate < $1.creationDate }
                             ForEach(sortedProjects) { project in
@@ -61,9 +61,6 @@ struct SidebarView: View {
                                         modelContext.delete(project)
                                     }
                                 }
-                                .simultaneousGesture(TapGesture(count: 2).onEnded {
-                                    projectToEdit = project
-                                })
                             }
                         } else {
                             Text("Sin proyectos")
@@ -84,9 +81,6 @@ struct SidebarView: View {
                                 modelContext.delete(area)
                             }
                         }
-                        .simultaneousGesture(TapGesture(count: 2).onEnded {
-                            areaToEdit = area
-                        })
                     }
                 }
                 
@@ -122,9 +116,6 @@ struct SidebarView: View {
                                 modelContext.delete(project)
                             }
                         }
-                        .simultaneousGesture(TapGesture(count: 2).onEnded {
-                            projectToEdit = project
-                        })
                     }
                 }
             }
@@ -148,9 +139,6 @@ struct SidebarView: View {
                             modelContext.delete(tag)
                         }
                     }
-                    .simultaneousGesture(TapGesture(count: 2).onEnded {
-                        tagToEdit = tag
-                    })
                 }
                 
                 Button {

@@ -9,6 +9,7 @@ struct ProjectFormView: View {
     
     @State private var title: String = ""
     @State private var notes: String = ""
+    @State private var isCompleted: Bool = false
     
     @Query private var areas: [Area]
     @State private var selectedArea: Area?
@@ -57,6 +58,12 @@ struct ProjectFormView: View {
                             .labelsHidden()
                             .pickerStyle(.menu)
                         }
+                        
+                        if projectToEdit != nil {
+                            Divider()
+                            Toggle("Proyecto Completado (Archivar)", isOn: $isCompleted)
+                                .tint(.green)
+                        }
                     }
                     .padding()
                     .background(.regularMaterial)
@@ -77,6 +84,7 @@ struct ProjectFormView: View {
                     title = project.title
                     notes = project.notes
                     selectedArea = project.area
+                    isCompleted = project.isCompleted
                 }
             }
             #if os(iOS)
@@ -107,11 +115,12 @@ struct ProjectFormView: View {
             project.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
             project.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
             project.area = selectedArea
+            project.isCompleted = isCompleted
         } else {
             let newProject = Project(
                 title: title.trimmingCharacters(in: .whitespacesAndNewlines),
                 notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
-                isCompleted: false
+                isCompleted: isCompleted
             )
             newProject.area = selectedArea
             modelContext.insert(newProject)

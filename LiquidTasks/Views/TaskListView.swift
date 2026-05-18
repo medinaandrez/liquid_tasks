@@ -41,28 +41,58 @@ struct TaskListView: View {
         }
         return tasks
     }
-    
     var body: some View {
-        List {
-            ForEach(filteredTasks) { task in
-                TaskRowView(task: task)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        taskToEdit = task
-                    }
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                .contextMenu {
-                    Button("Eliminar", role: .destructive) {
-                        modelContext.delete(task)
-                    }
+        ZStack {
+            if filteredTasks.isEmpty {
+                VStack(spacing: 20) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 60))
+                        .foregroundStyle(.tertiary)
+                    Text("Nada por aquí.")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                    Text("¡Disfruta tu día!")
+                        .foregroundStyle(.tertiary)
                 }
+            } else {
+                List {
+                    ForEach(filteredTasks) { task in
+                        TaskRowView(task: task)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                taskToEdit = task
+                            }
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                            .contextMenu {
+                                Button("Eliminar", role: .destructive) {
+                                    modelContext.delete(task)
+                                }
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button(role: .destructive) {
+                                    modelContext.delete(task)
+                                } label: {
+                                    Label("Eliminar", systemImage: "trash")
+                                }
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button {
+                                    task.isCompleted.toggle()
+                                } label: {
+                                    Label(task.isCompleted ? "Desmarcar" : "Completar", systemImage: "checkmark")
+                                }
+                                .tint(task.isCompleted ? .orange : .green)
+                            }
+                    }
+                    .onMove(perform: moveTask)
+                }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
             }
-            .onMove(perform: moveTask)
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
         .sheet(item: $taskToEdit) { task in
             TaskFormView(taskToEdit: task)
         }

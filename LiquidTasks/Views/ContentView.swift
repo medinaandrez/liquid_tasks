@@ -78,6 +78,7 @@ struct DetailView: View {
                 } label: {
                     Label("Nueva Tarea", systemImage: "plus")
                 }
+                .keyboardShortcut("n", modifiers: .command)
             }
         }
         .sheet(isPresented: $showingTaskForm) {
