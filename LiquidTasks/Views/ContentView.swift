@@ -82,8 +82,18 @@ struct DetailView: View {
             }
         }
         .sheet(isPresented: $showingTaskForm) {
-            TaskFormView()
+            TaskFormView(defaultProject: defaultProjectForSelection, defaultTags: defaultTagsForSelection)
         }
+    }
+    
+    private var defaultProjectForSelection: Project? {
+        if case .project(let p) = selection { return p }
+        return nil
+    }
+    
+    private var defaultTagsForSelection: [Tag]? {
+        if case .tag(let t) = selection { return [t] }
+        return nil
     }
     
     private func titleForSelection() -> String {

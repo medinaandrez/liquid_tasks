@@ -6,6 +6,7 @@ struct ProjectFormView: View {
     @Environment(\.dismiss) private var dismiss
     
     var projectToEdit: Project?
+    var defaultArea: Area?
     
     @State private var title: String = ""
     @State private var notes: String = ""
@@ -85,6 +86,8 @@ struct ProjectFormView: View {
                     notes = project.notes
                     selectedArea = project.area
                     isCompleted = project.isCompleted
+                } else {
+                    selectedArea = defaultArea
                 }
             }
             #if os(iOS)

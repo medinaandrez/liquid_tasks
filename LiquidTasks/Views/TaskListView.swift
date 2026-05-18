@@ -55,6 +55,7 @@ struct TaskListView: View {
                     Text("¡Disfruta tu día!")
                         .foregroundStyle(.tertiary)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
                     ForEach(filteredTasks) { task in

@@ -25,6 +25,8 @@ struct SidebarView: View {
     @State private var projectToEdit: Project?
     @State private var tagToEdit: Tag?
     
+    @State private var defaultAreaForNewProject: Area?
+    
     var body: some View {
         List(selection: $selection) {
             Section("Vistas Inteligentes") {
@@ -74,6 +76,10 @@ struct SidebarView: View {
                                 .foregroundStyle(.primary)
                         }
                         .contextMenu {
+                            Button("Añadir Proyecto aquí") {
+                                defaultAreaForNewProject = area
+                                showingProjectForm = true
+                            }
                             Button("Editar") {
                                 areaToEdit = area
                             }
@@ -93,6 +99,11 @@ struct SidebarView: View {
                 .buttonStyle(.plain)
                 
                 Button {
+                    if case .area(let selectedArea) = selection {
+                        defaultAreaForNewProject = selectedArea
+                    } else {
+                        defaultAreaForNewProject = nil
+                    }
                     showingProjectForm = true
                 } label: {
                     Label("Añadir Proyecto", systemImage: "plus.app")
@@ -161,7 +172,7 @@ struct SidebarView: View {
             AreaFormView()
         }
         .sheet(isPresented: $showingProjectForm) {
-            ProjectFormView()
+            ProjectFormView(defaultArea: defaultAreaForNewProject)
         }
         .sheet(isPresented: $showingTagForm) {
             TagFormView()

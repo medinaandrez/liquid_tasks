@@ -13,6 +13,8 @@ struct TaskFormView: View {
     @Environment(\.dismiss) private var dismiss
     
     var taskToEdit: Task?
+    var defaultProject: Project?
+    var defaultTags: [Tag]?
     
     @State private var title: String = ""
     @State private var notes: String = ""
@@ -220,6 +222,11 @@ struct TaskFormView: View {
                     }
                     if let s = task.subtasks {
                         subtasks = s.sorted(by: { $0.sortOrder < $1.sortOrder }).map { SubtaskDraft(title: $0.title, isCompleted: $0.isCompleted, original: $0) }
+                    }
+                } else {
+                    selectedProject = defaultProject
+                    if let tags = defaultTags {
+                        selectedTags = Set(tags)
                     }
                 }
             }
