@@ -16,7 +16,7 @@ final class Task {
     
     // Relaciones (inferidas a través de los inversos en los padres/entidades relacionadas)
     var project: Project?
-    var area: Area?
+    var space: Space?
     var tags: [Tag]?
     
     // Relación de uno a muchos (hijos)

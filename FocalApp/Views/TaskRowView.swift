@@ -35,8 +35,8 @@ struct TaskRowView: View {
                         Label(project.title, systemImage: "circle.fill")
                             .font(.caption)
                             .foregroundStyle(.blue)
-                    } else if let area = task.area {
-                        Label(area.title, systemImage: "folder.fill")
+                    } else if let space = task.space {
+                        Label(space.title, systemImage: "folder.fill")
                             .font(.caption)
                             .foregroundStyle(.purple)
                     }

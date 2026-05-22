@@ -9,8 +9,8 @@ final class Project {
     var isCompleted: Bool
     var creationDate: Date
     
-    // Relación hacia el área (padre)
-    var area: Area?
+    // Relación hacia el espacio (padre)
+    var space: Space?
     
     // Relación de uno a muchos (hijos)
     @Relationship(deleteRule: .cascade, inverse: \Task.project) var tasks: [Task]?

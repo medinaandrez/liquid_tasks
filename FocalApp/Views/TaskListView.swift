@@ -13,7 +13,7 @@ struct TaskListView: View {
         var tasks = allTasks.filter { task in
             switch selection {
             case .inbox:
-                return task.project == nil && task.area == nil
+                return task.project == nil && task.space == nil
             case .today:
                 guard let dueDate = task.dueDate else { return false }
                 return Calendar.current.isDateInToday(dueDate) || dueDate < Date()
@@ -21,8 +21,8 @@ struct TaskListView: View {
                 guard let dueDate = task.dueDate else { return false }
                 return dueDate > Date() && !Calendar.current.isDateInToday(dueDate)
 
-            case .area(let selectedArea):
-                return task.area?.id == selectedArea.id || task.project?.area?.id == selectedArea.id
+            case .space(let selectedSpace):
+                return task.space?.id == selectedSpace.id || task.project?.space?.id == selectedSpace.id
             case .project(let selectedProject):
                 return task.project?.id == selectedProject.id
             case .tag(let selectedTag):

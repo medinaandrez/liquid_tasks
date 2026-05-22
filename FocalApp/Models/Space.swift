@@ -2,13 +2,13 @@ import Foundation
 import SwiftData
 
 @Model
-final class Area {
+final class Space {
     @Attribute(.unique) var id: UUID
     var title: String
     var creationDate: Date
     
-    @Relationship(deleteRule: .cascade, inverse: \Project.area) var projects: [Project]?
-    @Relationship(deleteRule: .cascade, inverse: \Task.area) var tasks: [Task]? // Tareas sueltas dentro de un área
+    @Relationship(deleteRule: .cascade, inverse: \Project.space) var projects: [Project]?
+    @Relationship(deleteRule: .cascade, inverse: \Task.space) var tasks: [Task]? // Tareas sueltas dentro de un espacio
     
     init(id: UUID = UUID(), title: String, creationDate: Date = Date()) {
         self.id = id

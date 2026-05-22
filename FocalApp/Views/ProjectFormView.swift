@@ -6,14 +6,14 @@ struct ProjectFormView: View {
     @Environment(\.dismiss) private var dismiss
     
     var projectToEdit: Project?
-    var defaultArea: Area?
+    var defaultSpace: Space?
     
     @State private var title: String = ""
     @State private var notes: String = ""
     @State private var isCompleted: Bool = false
     
-    @Query private var areas: [Area]
-    @State private var selectedArea: Area?
+    @Query private var spaces: [Space]
+    @State private var selectedSpace: Space?
     
     var body: some View {
         NavigationStack {
@@ -48,12 +48,12 @@ struct ProjectFormView: View {
                             .foregroundStyle(.secondary)
                         
                         HStack {
-                            Text("Área")
+                            Text("Espacio")
                             Spacer()
-                            Picker("Área", selection: $selectedArea) {
-                                Text("Ninguna").tag(Area?.none)
-                                ForEach(areas) { area in
-                                    Text(area.title).tag(Area?.some(area))
+                            Picker("Espacio", selection: $selectedSpace) {
+                                Text("Ninguno").tag(Space?.none)
+                                ForEach(spaces) { space in
+                                    Text(space.title).tag(Space?.some(space))
                                 }
                             }
                             .labelsHidden()
@@ -84,10 +84,10 @@ struct ProjectFormView: View {
                 if let project = projectToEdit {
                     title = project.title
                     notes = project.notes
-                    selectedArea = project.area
+                    selectedSpace = project.space
                     isCompleted = project.isCompleted
                 } else {
-                    selectedArea = defaultArea
+                    selectedSpace = defaultSpace
                 }
             }
             #if os(iOS)
@@ -117,7 +117,7 @@ struct ProjectFormView: View {
         if let project = projectToEdit {
             project.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
             project.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
-            project.area = selectedArea
+            project.space = selectedSpace
             project.isCompleted = isCompleted
         } else {
             let newProject = Project(
@@ -125,7 +125,7 @@ struct ProjectFormView: View {
                 notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
                 isCompleted: isCompleted
             )
-            newProject.area = selectedArea
+            newProject.space = selectedSpace
             modelContext.insert(newProject)
         }
         dismiss()

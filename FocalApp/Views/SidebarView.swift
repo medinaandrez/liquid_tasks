@@ -5,27 +5,27 @@ enum NavigationItem: Hashable {
     case inbox
     case today
     case upcoming
-    case area(Area)
+    case space(Space)
     case project(Project)
     case tag(Tag)
 }
 
 struct SidebarView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Area.creationDate) private var areas: [Area]
-    @Query(filter: #Predicate<Project> { $0.area == nil && $0.isCompleted == false }, sort: \Project.creationDate) private var orphanProjects: [Project]
+    @Query(sort: \Space.creationDate) private var spaces: [Space]
+    @Query(filter: #Predicate<Project> { $0.space == nil && $0.isCompleted == false }, sort: \Project.creationDate) private var orphanProjects: [Project]
     @Query(sort: \Tag.name) private var tags: [Tag]
     @Binding var selection: NavigationItem?
     
-    @State private var showingAreaForm = false
+    @State private var showingSpaceForm = false
     @State private var showingProjectForm = false
     @State private var showingTagForm = false
     
-    @State private var areaToEdit: Area?
+    @State private var spaceToEdit: Space?
     @State private var projectToEdit: Project?
     @State private var tagToEdit: Tag?
     
-    @State private var defaultAreaForNewProject: Area?
+    @State private var defaultSpaceForNewProject: Space?
     
     var body: some View {
         ZStack {
@@ -38,7 +38,7 @@ struct SidebarView: View {
             .ignoresSafeArea()
             
             List(selection: $selection) {
-                Section("Vistas Inteligentes") {
+                Section {
                     NavigationLink(value: NavigationItem.inbox) {
                         Label("Bandeja de Entrada", systemImage: "tray.and.arrow.down.fill")
                             .foregroundStyle(.primary)
@@ -53,10 +53,10 @@ struct SidebarView: View {
                     }
                 }
                 
-                Section("Áreas de Enfoque") {
-                    ForEach(areas) { area in
+                Section("Espacios de Enfoque") {
+                    ForEach(spaces) { space in
                         DisclosureGroup {
-                            if let projects = area.projects?.filter({ !$0.isCompleted }), !projects.isEmpty {
+                            if let projects = space.projects?.filter({ !$0.isCompleted }), !projects.isEmpty {
                                 // Sort projects manually as SwiftData @Relationship arrays are not ordered
                                 let sortedProjects = projects.sorted { $0.creationDate < $1.creationDate }
                                 ForEach(sortedProjects) { project in
@@ -80,38 +80,38 @@ struct SidebarView: View {
                                     .padding(.leading)
                             }
                         } label: {
-                            NavigationLink(value: NavigationItem.area(area)) {
-                                Label(area.title, systemImage: "folder.fill")
+                            NavigationLink(value: NavigationItem.space(space)) {
+                                Label(space.title, systemImage: "folder.fill")
                                     .foregroundStyle(.primary)
                             }
                             .contextMenu {
                                 Button("Añadir Proyecto aquí") {
-                                    defaultAreaForNewProject = area
+                                    defaultSpaceForNewProject = space
                                     showingProjectForm = true
                                 }
                                 Button("Editar") {
-                                    areaToEdit = area
+                                    spaceToEdit = space
                                 }
-                                Button("Eliminar Área", role: .destructive) {
-                                    modelContext.delete(area)
+                                Button("Eliminar Espacio", role: .destructive) {
+                                    modelContext.delete(space)
                                 }
                             }
                         }
                     }
                     
                     Button {
-                        showingAreaForm = true
+                        showingSpaceForm = true
                     } label: {
-                        Label("Añadir Área", systemImage: "plus.circle")
+                        Label("Añadir Espacio", systemImage: "plus.circle")
                             .foregroundStyle(.secondary)
                     }
                     .buttonStyle(.plain)
                     
                     Button {
-                        if case .area(let selectedArea) = selection {
-                            defaultAreaForNewProject = selectedArea
+                        if case .space(let selectedSpace) = selection {
+                            defaultSpaceForNewProject = selectedSpace
                         } else {
-                            defaultAreaForNewProject = nil
+                            defaultSpaceForNewProject = nil
                         }
                         showingProjectForm = true
                     } label: {
@@ -177,17 +177,17 @@ struct SidebarView: View {
         #if os(macOS)
         .navigationSplitViewColumnWidth(min: 200, ideal: 250, max: 300)
         #endif
-        .sheet(isPresented: $showingAreaForm) {
-            AreaFormView()
+        .sheet(isPresented: $showingSpaceForm) {
+            SpaceFormView()
         }
         .sheet(isPresented: $showingProjectForm) {
-            ProjectFormView(defaultArea: defaultAreaForNewProject)
+            ProjectFormView(defaultSpace: defaultSpaceForNewProject)
         }
         .sheet(isPresented: $showingTagForm) {
             TagFormView()
         }
-        .sheet(item: $areaToEdit) { area in
-            AreaFormView(areaToEdit: area)
+        .sheet(item: $spaceToEdit) { space in
+            SpaceFormView(spaceToEdit: space)
         }
         .sheet(item: $projectToEdit) { project in
             ProjectFormView(projectToEdit: project)

@@ -1,11 +1,11 @@
 import SwiftUI
 import SwiftData
 
-struct AreaFormView: View {
+struct SpaceFormView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
-    var areaToEdit: Area?
+    var spaceToEdit: Space?
     
     @State private var title: String = ""
     
@@ -20,7 +20,7 @@ struct AreaFormView: View {
                             .fontWeight(.semibold)
                             .foregroundStyle(.secondary)
                         
-                        TextField("Nombre del Área", text: $title)
+                        TextField("Nombre del Espacio", text: $title)
                             .textFieldStyle(.roundedBorder)
                             .font(.title3)
                     }
@@ -36,10 +36,10 @@ struct AreaFormView: View {
                 LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea()
             )
-            .navigationTitle(areaToEdit == nil ? "Nueva Área" : "Editar Área")
+            .navigationTitle(spaceToEdit == nil ? "Nuevo Espacio" : "Editar Espacio")
             .onAppear {
-                if let area = areaToEdit {
-                    title = area.title
+                if let space = spaceToEdit {
+                    title = space.title
                 }
             }
             #if os(iOS)
@@ -53,7 +53,7 @@ struct AreaFormView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Guardar") {
-                        saveArea()
+                        saveSpace()
                     }
                     .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .buttonStyle(.borderedProminent)
@@ -65,14 +65,14 @@ struct AreaFormView: View {
         #endif
     }
     
-    private func saveArea() {
-        if let area = areaToEdit {
-            area.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func saveSpace() {
+        if let space = spaceToEdit {
+            space.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
         } else {
-            let newArea = Area(
+            let newSpace = Space(
                 title: title.trimmingCharacters(in: .whitespacesAndNewlines)
             )
-            modelContext.insert(newArea)
+            modelContext.insert(newSpace)
         }
         dismiss()
     }
