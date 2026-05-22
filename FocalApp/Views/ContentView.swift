@@ -3,6 +3,8 @@ import SwiftData
 
 struct ContentView: View {
     @State private var selection: NavigationItem? = .inbox
+    @Query private var tasks: [Task]
+    @AppStorage("iconBadgePreference") private var iconBadgePreference: String = "today"
     
     var body: some View {
         NavigationSplitView {
@@ -10,6 +12,44 @@ struct ContentView: View {
         } detail: {
             DetailView(selection: selection)
         }
+        .onAppear {
+            updateBadge()
+        }
+        .onChange(of: tasks.count) { _ in
+            updateBadge()
+        }
+        .onChange(of: iconBadgePreference) { _ in
+            updateBadge()
+        }
+    }
+    
+    private func updateBadge() {
+        let count: Int
+        switch iconBadgePreference {
+        case "today":
+            let today = Calendar.current.startOfDay(for: Date())
+            count = tasks.filter { task in
+                guard !task.isCompleted else { return false }
+                if let dueDate = task.dueDate {
+                    return Calendar.current.startOfDay(for: dueDate) <= today
+                }
+                return false
+            }.count
+        case "inbox":
+            count = tasks.filter { !$0.isCompleted && $0.project == nil && $0.space == nil }.count
+        default:
+            count = 0
+        }
+        
+        #if os(iOS)
+        UIApplication.shared.applicationIconBadgeNumber = count
+        #elseif os(macOS)
+        if count > 0 {
+            NSApplication.shared.dockTile.badgeLabel = "\(count)"
+        } else {
+            NSApplication.shared.dockTile.badgeLabel = nil
+        }
+        #endif
     }
 }
 

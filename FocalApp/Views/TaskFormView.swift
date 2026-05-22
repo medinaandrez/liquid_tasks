@@ -32,6 +32,7 @@ struct TaskFormView: View {
     @Query private var allTags: [Tag]
     @State private var selectedTags: Set<Tag> = []
     @AppStorage("appTheme") private var appTheme: String = "classic"
+    @AppStorage("defaultScheduleToday") private var defaultScheduleToday: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -234,6 +235,10 @@ struct TaskFormView: View {
                     selectedProject = defaultProject
                     if let tags = defaultTags {
                         selectedTags = Set(tags)
+                    }
+                    if defaultScheduleToday {
+                        hasDueDate = true
+                        dueDate = Date()
                     }
                 }
             }
