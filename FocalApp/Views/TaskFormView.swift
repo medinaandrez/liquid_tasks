@@ -31,6 +31,7 @@ struct TaskFormView: View {
     
     @Query private var allTags: [Tag]
     @State private var selectedTags: Set<Tag> = []
+    @AppStorage("appTheme") private var appTheme: String = "classic"
     
     var body: some View {
         NavigationStack {
@@ -200,8 +201,14 @@ struct TaskFormView: View {
                 .padding()
             }
             .background(
-                LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
-                    .ignoresSafeArea()
+                Group {
+                    if let currentTheme = AppTheme(rawValue: appTheme) {
+                        currentTheme.detailGradient
+                    } else {
+                        LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
+                    }
+                }
+                .ignoresSafeArea()
             )
             .navigationTitle(taskToEdit == nil ? "Nueva Tarea" : "Editar Tarea")
             .onAppear {

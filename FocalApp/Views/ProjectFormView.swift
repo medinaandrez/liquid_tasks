@@ -14,6 +14,7 @@ struct ProjectFormView: View {
     
     @Query private var spaces: [Space]
     @State private var selectedSpace: Space?
+    @AppStorage("appTheme") private var appTheme: String = "classic"
     
     var body: some View {
         NavigationStack {
@@ -76,8 +77,14 @@ struct ProjectFormView: View {
             }
             // Fondo general para simular "Liquid Glass"
             .background(
-                LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
-                    .ignoresSafeArea()
+                Group {
+                    if let currentTheme = AppTheme(rawValue: appTheme) {
+                        currentTheme.detailGradient
+                    } else {
+                        LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
+                    }
+                }
+                .ignoresSafeArea()
             )
             .navigationTitle(projectToEdit == nil ? "Nuevo Proyecto" : "Editar Proyecto")
             .onAppear {

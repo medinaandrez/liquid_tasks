@@ -20,6 +20,7 @@ struct SidebarView: View {
     @State private var showingSpaceForm = false
     @State private var showingProjectForm = false
     @State private var showingTagForm = false
+    @State private var showingSettings = false
     
     @State private var spaceToEdit: Space?
     @State private var projectToEdit: Project?
@@ -27,15 +28,15 @@ struct SidebarView: View {
     
     @State private var defaultSpaceForNewProject: Space?
     
+    @AppStorage("appTheme") private var appTheme: String = "classic"
+    @AppStorage("glassmorphicEffects") private var glassmorphicEffects: Bool = true
+    
     var body: some View {
         ZStack {
             // Fondo colorido simulando vibrancia para que el Material "brille" (Estilo Liquid Glass)
-            LinearGradient(
-                colors: [Color.blue.opacity(0.18), Color.purple.opacity(0.25)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            let currentTheme = AppTheme(rawValue: appTheme) ?? .classic
+            currentTheme.sidebarGradient
+                .ignoresSafeArea()
             
             List(selection: $selection) {
                 Section {
@@ -169,9 +170,23 @@ struct SidebarView: View {
                     }
                     .buttonStyle(.plain)
                 }
+                
+                Section {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Label("Ajustes", systemImage: "gearshape.fill")
+                            .foregroundStyle(.primary)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
             .scrollContentBackground(.hidden)
-            .background(.thinMaterial)
+            .background {
+                if glassmorphicEffects {
+                    Color.clear.background(.thinMaterial)
+                }
+            }
         }
         .navigationTitle("Focal App")
         #if os(macOS)
@@ -194,6 +209,9 @@ struct SidebarView: View {
         }
         .sheet(item: $tagToEdit) { tag in
             TagFormView(tagToEdit: tag)
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
         }
     }
 }

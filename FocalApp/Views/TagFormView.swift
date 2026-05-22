@@ -9,6 +9,7 @@ struct TagFormView: View {
     
     @State private var name: String = ""
     @State private var colorHex: String = "#FF3B30" // Default Red
+    @AppStorage("appTheme") private var appTheme: String = "classic"
     
     private let predefinedColors: [(name: String, hex: String)] = [
         ("Rojo", "#FF3B30"),
@@ -75,8 +76,14 @@ struct TagFormView: View {
                 .padding()
             }
             .background(
-                LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
-                    .ignoresSafeArea()
+                Group {
+                    if let currentTheme = AppTheme(rawValue: appTheme) {
+                        currentTheme.detailGradient
+                    } else {
+                        LinearGradient(colors: [Color.blue.opacity(0.05), Color.purple.opacity(0.05)], startPoint: .top, endPoint: .bottom)
+                    }
+                }
+                .ignoresSafeArea()
             )
             .navigationTitle(tagToEdit == nil ? "Nueva Etiqueta" : "Editar Etiqueta")
             .onAppear {

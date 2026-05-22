@@ -16,20 +16,18 @@ struct ContentView: View {
 struct DetailView: View {
     var selection: NavigationItem?
     @State private var showingTaskForm = false
+    @AppStorage("appTheme") private var appTheme: String = "classic"
+    @AppStorage("glassmorphicEffects") private var glassmorphicEffects: Bool = true
     
     var body: some View {
         ZStack {
             // Fondo colorido simulando vibrancia para que el Material "brille"
-            LinearGradient(
-                colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.3)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            let currentTheme = AppTheme(rawValue: appTheme) ?? .classic
+            currentTheme.detailGradient
+                .ignoresSafeArea()
             
             // Panel Principal con Liquid Glass
             VStack(alignment: .leading, spacing: 0) {
-
                 
                 if selection == nil {
                     VStack {
@@ -48,7 +46,13 @@ struct DetailView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(.thinMaterial) // Material Glass
+            .background {
+                if glassmorphicEffects {
+                    Color.clear.background(.thinMaterial)
+                } else {
+                    Color.clear.background(.background)
+                }
+            }
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
             .overlay(
