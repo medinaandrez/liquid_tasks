@@ -1,6 +1,6 @@
-# LiquidTasks 💧
+# Focal App 🔍
 
-**LiquidTasks** is a modern, premium productivity and task management application built entirely natively for the Apple ecosystem. It features a stunning, custom **"Liquid Glass"** aesthetic design with a heavy focus on user experience, intelligent contextual interactions, and fluid animations.
+**Focal App** is a modern, premium productivity and task management application built entirely natively for the Apple ecosystem. It features a stunning, custom **"Liquid Glass"** aesthetic design with a heavy focus on user experience, intelligent contextual interactions, and fluid animations.
 
 ## ✨ Features
 
@@ -29,7 +29,7 @@ To run this project locally, you will need **Xcode 15** or newer.
    ```bash
    git clone https://github.com/medinaandrez/liquid_tasks.git
    ```
-2. Open the project folder and double-click `LiquidTasks.xcodeproj` to open it in Xcode.
+2. Open the project folder and double-click `Focal App.xcodeproj` to open it in Xcode.
 3. Select your target device (e.g., "My Mac" or an "iOS Simulator").
 4. Press `Cmd + R` to build and run the application.
 
@@ -37,7 +37,7 @@ To run this project locally, you will need **Xcode 15** or newer.
 
 ## 🎨 Design Philosophy
 
-LiquidTasks distances itself from the flat, boring designs of traditional to-do apps. By heavily utilizing SwiftUI's `Material` system (`.thinMaterial`, `.regularMaterial`), subtle drop shadows, and vibrant background gradients, the app achieves a frosted glass look that feels tactile and alive, encouraging users to actually *want* to organize their day.
+Focal App distances itself from the flat, boring designs of traditional to-do apps. By heavily utilizing SwiftUI's `Material` system (`.thinMaterial`, `.regularMaterial`), subtle drop shadows, and vibrant background gradients, the app achieves a frosted glass look that feels tactile and alive, encouraging users to actually *want* to organize their day.
 
 ---
 

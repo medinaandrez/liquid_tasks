@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct LiquidTasksApp: App {
+struct FocalApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Task.self, Subtask.self, Project.self, Area.self, Tag.self

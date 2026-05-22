@@ -161,7 +161,7 @@ struct SidebarView: View {
                 .buttonStyle(.plain)
             }
         }
-        .navigationTitle("LiquidTasks")
+        .navigationTitle("Focal App")
         #if os(macOS)
         .navigationSplitViewColumnWidth(min: 200, ideal: 250, max: 300)
         #endif

@@ -29,15 +29,7 @@ struct DetailView: View {
             
             // Panel Principal con Liquid Glass
             VStack(alignment: .leading, spacing: 0) {
-                // Header (Title)
-                if selection != nil {
-                    Text(titleForSelection())
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding(.horizontal)
-                        .padding(.top, 24)
-                        .padding(.bottom, 8)
-                }
+
                 
                 if selection == nil {
                     VStack {
