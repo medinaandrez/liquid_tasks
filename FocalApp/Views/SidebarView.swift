@@ -170,16 +170,6 @@ struct SidebarView: View {
                     }
                     .buttonStyle(.plain)
                 }
-                
-                Section {
-                    Button {
-                        showingSettings = true
-                    } label: {
-                        Label("Ajustes", systemImage: "gearshape.fill")
-                            .foregroundStyle(.primary)
-                    }
-                    .buttonStyle(.plain)
-                }
             }
             .scrollContentBackground(.hidden)
             .background {
@@ -189,6 +179,30 @@ struct SidebarView: View {
             }
         }
         .navigationTitle("Focal App")
+        .toolbar {
+            #if os(iOS)
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Label("Ajustes", systemImage: "gearshape")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .font(.title3)
+                }
+            }
+            #elseif os(macOS)
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showingSettings = true
+                } label: {
+                    Label("Ajustes", systemImage: "gearshape")
+                }
+            }
+            #endif
+        }
         #if os(macOS)
         .navigationSplitViewColumnWidth(min: 200, ideal: 250, max: 300)
         #endif

@@ -23,5 +23,12 @@ struct FocalApp: App {
             ContentView()
         }
         .modelContainer(sharedModelContainer)
+        
+        #if os(macOS)
+        Settings {
+            SettingsView()
+                .modelContainer(sharedModelContainer)
+        }
+        #endif
     }
 }
