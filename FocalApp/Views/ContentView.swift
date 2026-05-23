@@ -151,6 +151,9 @@ struct DetailView: View {
                 .ignoresSafeArea()
         )
         .navigationTitle(titleForSelection())
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         .toolbar {
             #if os(iOS)
             ToolbarItem(placement: .topBarTrailing) {
