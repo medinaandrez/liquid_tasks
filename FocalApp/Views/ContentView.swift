@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @State private var selection: NavigationItem? = .inbox
+    @State private var selection: NavigationItem? = nil
     @Query private var tasks: [Task]
     @AppStorage("iconBadgePreference") private var iconBadgePreference: String = "today"
     
@@ -17,6 +17,11 @@ struct ContentView: View {
         }
         .onAppear {
             updateBadge()
+            DispatchQueue.main.async {
+                if selection == nil {
+                    selection = .inbox
+                }
+            }
         }
         .onChange(of: tasks.count) { _ in
             updateBadge()
@@ -151,9 +156,6 @@ struct DetailView: View {
                 .ignoresSafeArea()
         )
         .navigationTitle(titleForSelection())
-        #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
-        #endif
         .toolbar {
             #if os(iOS)
             ToolbarItem(placement: .topBarTrailing) {
