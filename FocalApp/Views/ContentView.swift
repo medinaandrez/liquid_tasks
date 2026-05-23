@@ -62,11 +62,9 @@ struct DetailView: View {
     @AppStorage("glassmorphicEffects") private var glassmorphicEffects: Bool = true
     
     var body: some View {
+        let currentTheme = AppTheme(rawValue: appTheme) ?? .classic
+        
         ZStack {
-            // Fondo colorido simulando vibrancia para que el Material "brille"
-            let currentTheme = AppTheme(rawValue: appTheme) ?? .classic
-            currentTheme.detailGradient
-                .ignoresSafeArea()
             
             // Panel Principal con Liquid Glass
             VStack(alignment: .leading, spacing: 0) {
@@ -146,6 +144,10 @@ struct DetailView: View {
                 }
             }
         }
+        .background(
+            currentTheme.detailGradient
+                .ignoresSafeArea()
+        )
         .navigationTitle(titleForSelection())
         .toolbar {
             #if os(iOS)
