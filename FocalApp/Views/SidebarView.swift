@@ -21,6 +21,7 @@ struct SidebarView: View {
     @State private var showingProjectForm = false
     @State private var showingTagForm = false
     @State private var showingSettings = false
+    @State private var showingAnalytics = false
     
     @State private var spaceToEdit: Space?
     @State private var projectToEdit: Project?
@@ -82,8 +83,13 @@ struct SidebarView: View {
                             }
                         } label: {
                             NavigationLink(value: NavigationItem.space(space)) {
-                                Label(space.title, systemImage: "folder.fill")
-                                    .foregroundStyle(.primary)
+                                Label {
+                                    Text(space.title)
+                                        .foregroundStyle(.primary)
+                                } icon: {
+                                    Image(systemName: space.iconName.isEmpty ? "folder.fill" : space.iconName)
+                                        .foregroundStyle(Color(hex: space.colorHex.isEmpty ? "#007AFF" : space.colorHex))
+                                }
                             }
                             .contextMenu {
                                 Button("Añadir Proyecto aquí") {
@@ -184,6 +190,11 @@ struct SidebarView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
                     Button {
+                        showingAnalytics = true
+                    } label: {
+                        Label("Analíticas", systemImage: "chart.bar.xaxis")
+                    }
+                    Button {
                         showingSettings = true
                     } label: {
                         Label("Ajustes", systemImage: "gearshape")
@@ -195,10 +206,17 @@ struct SidebarView: View {
             }
             #elseif os(macOS)
             ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showingSettings = true
-                } label: {
-                    Label("Ajustes", systemImage: "gearshape")
+                HStack(spacing: 8) {
+                    Button {
+                        showingAnalytics = true
+                    } label: {
+                        Label("Analíticas", systemImage: "chart.bar.fill")
+                    }
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Label("Ajustes", systemImage: "gearshape")
+                    }
                 }
             }
             #endif
@@ -226,6 +244,9 @@ struct SidebarView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+        }
+        .sheet(isPresented: $showingAnalytics) {
+            AnalyticsView()
         }
     }
 }

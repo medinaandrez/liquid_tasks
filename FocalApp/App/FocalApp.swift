@@ -5,7 +5,7 @@ import SwiftData
 struct FocalApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Task.self, Subtask.self, Project.self, Space.self, Tag.self
+            Task.self, Subtask.self, Project.self, Space.self, Tag.self, FocusSession.self
         ])
         
         // Estrictamente almacenamiento local

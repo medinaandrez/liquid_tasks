@@ -56,6 +56,7 @@ struct ContentView: View {
 struct DetailView: View {
     var selection: NavigationItem?
     @State private var showingTaskForm = false
+    @State private var showingFocusTimer = false
     @AppStorage("appTheme") private var appTheme: String = "classic"
     @AppStorage("glassmorphicEffects") private var glassmorphicEffects: Bool = true
     
@@ -100,6 +101,49 @@ struct DetailView: View {
                     .stroke(.white.opacity(0.2), lineWidth: 1) // Borde brillante
             )
             .padding()
+            
+            // Botón flotante del temporizador Pomodoro Líquido
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button {
+                        showingFocusTimer = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "timer")
+                                .font(.title3.bold())
+                            Text("Enfocar")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundStyle(.white)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 18)
+                        .background(
+                            ZStack {
+                                Color.black.opacity(0.15)
+                                let currentTheme = AppTheme(rawValue: appTheme) ?? .classic
+                                LinearGradient(
+                                    colors: currentTheme.previewColors,
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                                .opacity(0.85)
+                            }
+                        )
+                        .clipShape(Capsule())
+                        .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 5)
+                        .overlay(
+                            Capsule()
+                                .stroke(.white.opacity(0.25), lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 32)
+                    .padding(.bottom, 32)
+                }
+            }
         }
         .navigationTitle(titleForSelection())
         .toolbar {
@@ -119,6 +163,25 @@ struct DetailView: View {
         }
         .sheet(isPresented: $showingTaskForm) {
             TaskFormView(defaultProject: defaultProjectForSelection, defaultTags: defaultTagsForSelection)
+        }
+        .sheet(isPresented: $showingFocusTimer) {
+            FocusTimerView()
+        }
+        .tint(activeAccentColor)
+    }
+    
+    private var activeAccentColor: Color {
+        switch selection {
+        case .space(let space):
+            return space.colorHex.isEmpty ? .blue : Color(hex: space.colorHex)
+        case .project(let project):
+            if let space = project.space {
+                return space.colorHex.isEmpty ? .blue : Color(hex: space.colorHex)
+            }
+            return .blue
+        default:
+            let currentTheme = AppTheme(rawValue: appTheme) ?? .classic
+            return currentTheme.previewColors.first ?? .blue
         }
     }
     

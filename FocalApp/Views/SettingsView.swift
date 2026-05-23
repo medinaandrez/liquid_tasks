@@ -25,6 +25,7 @@ struct SettingsView: View {
     @State private var importText = ""
     @State private var showingImportStatus = false
     @State private var importSuccess = false
+    @State private var showingWidgetStudio = false
     
     var currentTheme: AppTheme {
         AppTheme(rawValue: appTheme) ?? .classic
@@ -142,6 +143,16 @@ struct SettingsView: View {
                         
                         Toggle("Efecto Esmerilado (Glassmorphism)", isOn: $glassmorphicEffects)
                             .tint(.blue)
+                        
+                        Divider()
+                        
+                        Button {
+                            showingWidgetStudio = true
+                        } label: {
+                            Label("Widget Studio (Diseña tus widgets)", systemImage: "square.dashed.inset.filled")
+                                .foregroundStyle(.blue)
+                        }
+                        .buttonStyle(.plain)
                     }
                     .listRowBackground(glassmorphicEffects ? Color.clear : nil)
                 } header: {
@@ -301,6 +312,9 @@ struct SettingsView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showingWidgetStudio) {
+                WidgetStudioView()
+            }
             .alert(importSuccess ? "Restauración Completada" : "Error en Importación", isPresented: $showingImportStatus) {
                 Button("Entendido", role: .cancel) {
                     importText = ""
@@ -335,9 +349,9 @@ struct SettingsView: View {
         purgeDatabase()
         
         // 1. Create Spaces
-        let workSpace = Space(title: "💼 Trabajo")
-        let personalSpace = Space(title: "🏡 Personal")
-        let studySpace = Space(title: "🎓 Estudios")
+        let workSpace = Space(title: "💼 Trabajo", iconName: "briefcase.fill", colorHex: "#5856D6")
+        let personalSpace = Space(title: "🏡 Personal", iconName: "house.fill", colorHex: "#FF2D55")
+        let studySpace = Space(title: "🎓 Estudios", iconName: "graduationcap.fill", colorHex: "#FF9500")
         
         modelContext.insert(workSpace)
         modelContext.insert(personalSpace)
@@ -404,7 +418,7 @@ struct SettingsView: View {
     
     // JSON Backup Serializer helper
     private func exportDataString() -> String {
-        let spacesDTO = spaces.map { ExportData.SpaceDTO(id: $0.id, title: $0.title, creationDate: $0.creationDate) }
+        let spacesDTO = spaces.map { ExportData.SpaceDTO(id: $0.id, title: $0.title, creationDate: $0.creationDate, iconName: $0.iconName, colorHex: $0.colorHex) }
         let projectsDTO = projects.map { ExportData.ProjectDTO(id: $0.id, title: $0.title, notes: $0.notes, isCompleted: $0.isCompleted, creationDate: $0.creationDate, spaceId: $0.space?.id) }
         let tagsDTO = tags.map { ExportData.TagDTO(id: $0.id, name: $0.name, colorHex: $0.colorHex) }
         let tasksDTO = tasks.map { ExportData.TaskDTO(id: $0.id, title: $0.title, notes: $0.notes, isCompleted: $0.isCompleted, startDate: $0.startDate, dueDate: $0.dueDate, creationDate: $0.creationDate, sortOrder: $0.sortOrder, projectId: $0.project?.id, spaceId: $0.space?.id, tagIds: $0.tags?.map(\.id)) }
@@ -458,7 +472,13 @@ struct SettingsView: View {
             
             // 1. Restore Spaces
             for spaceDTO in decoded.spaces {
-                let space = Space(id: spaceDTO.id, title: spaceDTO.title, creationDate: spaceDTO.creationDate)
+                let space = Space(
+                    id: spaceDTO.id,
+                    title: spaceDTO.title,
+                    creationDate: spaceDTO.creationDate,
+                    iconName: spaceDTO.iconName ?? "folder.fill",
+                    colorHex: spaceDTO.colorHex ?? "#007AFF"
+                )
                 modelContext.insert(space)
                 spaceMap[spaceDTO.id] = space
             }
@@ -526,6 +546,8 @@ struct ExportData: Codable {
         var id: UUID
         var title: String
         var creationDate: Date
+        var iconName: String?
+        var colorHex: String?
     }
     struct ProjectDTO: Codable {
         var id: UUID
