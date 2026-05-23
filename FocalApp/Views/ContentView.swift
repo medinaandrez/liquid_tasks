@@ -11,6 +11,7 @@ struct ContentView: View {
             SidebarView(selection: $selection)
         } detail: {
             DetailView(selection: selection)
+                .id(selection)
         }
         .onAppear {
             updateBadge()
