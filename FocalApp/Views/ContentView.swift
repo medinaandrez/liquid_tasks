@@ -10,8 +10,10 @@ struct ContentView: View {
         NavigationSplitView {
             SidebarView(selection: $selection)
         } detail: {
-            DetailView(selection: selection)
-                .id(selection)
+            NavigationStack {
+                DetailView(selection: selection)
+                    .id(selection)
+            }
         }
         .onAppear {
             updateBadge()
